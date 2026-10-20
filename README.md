@@ -67,7 +67,7 @@ The video itself is copy-protected and shows up black in screenshots, but this b
 1. **Badge appears**: it mutes the TV and shows a small pink **✿ Ad muted** tag.
 2. **Badge is gone for 2 seconds**: it unmutes.
 
-It only undoes a mute it made itself, so if you mute the TV yourself it stays muted. Nothing is recorded or sent anywhere; each check looks at a few thousand pixels and throws them away. You can switch it off in ✿ Menu.
+It only undoes a mute it made itself, so if you mute the TV yourself it stays muted. Nothing is recorded or sent anywhere; each check looks at a few thousand pixels and throws them away. You can switch it off in ✿ Menu. ✅ Tested on real HBO Max ad breaks.
 
 > This only mutes your own speakers. Ads still play, nothing is skipped or blocked, and your subscription works exactly as before.
 
