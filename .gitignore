@@ -1,0 +1,16 @@
+# Gradle / Android Studio
+.gradle/
+build/
+.idea/
+.kotlin/
+*.iml
+local.properties
+captures/
+
+# Signing material and build outputs (APKs go on the Releases page)
+*.jks
+*.keystore
+*.apk
+
+.DS_Store
+Thumbs.db

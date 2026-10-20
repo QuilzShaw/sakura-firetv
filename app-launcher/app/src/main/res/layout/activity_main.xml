@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/plum"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/still"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sakura_still" />
+
+    <VideoView
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:focusable="false" />
+
+    <View
+        android:id="@+id/scrimTop"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_gravity="top"
+        android:background="@drawable/scrim_top" />
+
+    <View
+        android:id="@+id/scrimBottom"
+        android:layout_width="match_parent"
+        android:layout_height="360dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/scrim_bottom" />
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:paddingTop="28dp"
+        android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:paddingStart="48dp"
+            android:paddingEnd="40dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/greeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:shadowColor="#AAFF6FA0"
+                    android:shadowRadius="12"
+                    android:textColor="@color/sakura_pink"
+                    android:textSize="15sp" />
+
+                <TextClock
+                    android:id="@+id/clock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-4dp"
+                    android:fontFamily="sans-serif-thin"
+                    android:format12Hour="h:mm"
+                    android:format24Hour="HH:mm"
+                    android:shadowColor="#CCFF9CC0"
+                    android:shadowRadius="24"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="58sp" />
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-6dp"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="EEEE, MMMM d"
+                    android:format24Hour="EEEE, MMMM d"
+                    android:textColor="@color/text_soft"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/pills"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:clipChildren="false"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/focusTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:fontFamily="sans-serif-medium"
+            android:shadowColor="#CC000000"
+            android:shadowRadius="10"
+            android:textColor="#FFFFFFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/focusHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/sakura_pink"
+            android:textSize="12sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/favorites"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="48dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="48dp"
+            android:paddingBottom="16dp" />
+
+        <TextView
+            android:id="@+id/appsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.12"
+            android:text="ALL APPS"
+            android:textColor="#B3F3E6EE"
+            android:textSize="11sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/apps"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="48dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="48dp"
+            android:paddingBottom="12dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ambient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="64dp"
+        android:layout_marginBottom="56dp"
+        android:alpha="0"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin"
+            android:format12Hour="h:mm"
+            android:format24Hour="HH:mm"
+            android:shadowColor="#FFFF9CC0"
+            android:shadowRadius="40"
+            android:textColor="#FFFFFFFF"
+            android:textSize="110sp" />
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-14dp"
+            android:fontFamily="sans-serif-light"
+            android:format12Hour="EEEE, MMMM d"
+            android:format24Hour="EEEE, MMMM d"
+            android:letterSpacing="0.06"
+            android:shadowColor="#CC000000"
+            android:shadowRadius="10"
+            android:textColor="@color/sakura_pink"
+            android:textSize="20sp" />
+    </LinearLayout>
+</FrameLayout>

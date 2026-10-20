@@ -1,0 +1,161 @@
+<div align="center">
+
+<img src="docs/images/hero.jpg" alt="Sakura Home: a moonlit cherry blossom scene with Mount Fuji and a pagoda" width="100%" />
+
+# 🌸 Sakura Firetv
+
+**A calm, ad-free cherry blossom home screen for Amazon Fire TV, plus the scripts to strip out the ads and tracking.**
+
+![Fire OS 8](https://img.shields.io/badge/Fire%20OS-8-ff8fb6?style=flat-square)
+![Android 11](https://img.shields.io/badge/Android-11%20(API%2030)-ffb7cf?style=flat-square)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.x-c98aa8?style=flat-square)
+![No root](https://img.shields.io/badge/root-not%20needed-6b4a6e?style=flat-square)
+![License: MIT](https://img.shields.io/badge/license-MIT-3a2246?style=flat-square)
+
+</div>
+
+---
+
+Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers and shopping prompts, plus several services that report what you watch. This project replaces all of that with a home screen you'd actually want to look at, and gives you one-command scripts to turn the rest off. Everything runs over ADB from a PC, nothing needs root, and every change can be undone.
+
+<div align="center">
+<img src="docs/images/sakura-preview.gif" alt="Animated background: petals falling past a glowing moon, with light rays and sparkles" width="640" />
+<br><sub>The live background: a seamless 20-second loop rendered from code</sub>
+</div>
+
+## ✨ What's inside
+
+| | Part | What it does |
+|---|---|---|
+| 🏯 | [**Sakura Home**](app-launcher) | A custom launcher app with an animated cherry blossom scene, your apps as glowing cards, one-press TV inputs and an ambient clock mode. It takes over the Home button. |
+| 🔇 | **HBO Max ad muting** | Built into Sakura Home: it mutes the TV during HBO Max ad breaks and unmutes when the show comes back. |
+| 🧹 | [**Debloat scripts**](scripts) | Turn off ad tracking, Automatic Content Recognition (ACR), telemetry and nag apps, and speed up the UI. Includes a one-command undo. |
+| 🎨 | [**Artwork generator**](artwork/generator) | The Python script that paints the wallpaper and renders the looping petal animation. |
+
+## 🏯 Sakura Home
+
+<!-- SCREENSHOTS -->
+
+**Home screen**
+- 🌙 **Living background**: falling petals, a glowing textured moon with slowly turning light rays, twinkling sparkles, drifting valley mist, and large out-of-focus foreground petals for depth.
+- 🕰️ **Glowing clock and date**, with a greeting that changes through the day (*Good morning* … *Sweet dreams*).
+- 💗 **Favorites row**: big banner cards that zoom in with a pink glow, a soft shadow and a light sweep when selected.
+- 🗂️ **All Apps row**: every installed app, with clutter hidden.
+- 📺 **TV input buttons**: one press for **HDMI 1–4** and **Antenna**, using your custom input names if you've set any. App-registered "inputs" are filtered out.
+- ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch and hidden apps.
+
+**Make it yours**
+- Hold **OK** on any app to **add it to favorites, move it left or right, remove it, or hide it**.
+- Hidden apps can be brought back from ✿ Menu → *Show hidden apps*.
+
+**Ambient mode**
+- After 3 minutes without a button press (or when you press **Back** on the home screen), the menus fade away and leave the sakura scene with a large glowing clock. Any button wakes it.
+
+**Behaves like a real home screen**
+- The **Home button** always lands on Sakura Home, including from inside apps.
+- **Starts on boot.**
+- Pauses its video when an app opens, so streaming apps get the full video decoder.
+
+### 🔇 HBO Max ad muting
+
+HBO Max exposes nothing that other apps can read: no "now playing" info, no readable on-screen text, and no standard audio player. During an ad break, though, it always draws the same bright yellow badge in the top-left corner:
+
+<div align="center"><img src="docs/images/hbo-ad-badge.png" alt="HBO Max ad badge: a yellow 'Ad' label followed by '1 of 1 :24'" width="420" /></div>
+
+The video itself is copy-protected and shows up black in screenshots, but this badge doesn't. So while HBO Max is in front, Sakura Home checks that small corner **once a second**:
+
+1. **Badge appears**: it mutes the TV and shows a small pink **✿ Ad muted** tag.
+2. **Badge is gone for 2 seconds**: it unmutes.
+
+It only undoes a mute it made itself, so if you mute the TV yourself it stays muted. Nothing is recorded or sent anywhere; each check looks at a few thousand pixels and throws them away. You can switch it off in ✿ Menu.
+
+> This only mutes your own speakers. Ads still play, nothing is skipped or blocked, and your subscription works exactly as before.
+
+### How the Home button takeover works
+
+Fire OS doesn't let you change the default launcher, so Sakura Home uses an **accessibility service**. When Amazon's home screen comes to the front, it opens Sakura Home on top. Two details make this work well:
+- Fire OS hosts its main **Settings** screen inside Amazon's home app, so Sakura Home briefly allows it whenever you open Settings. Otherwise you could never reach them.
+- It only acts on Amazon's *home* activity, so Amazon search, profiles and **long-press Home** (quick settings) still work.
+
+You might see a brief flash of Amazon's screen when you press Home; that's Fire OS drawing it before Sakura Home can step in.
+
+## 🧹 What the debloat script changes
+
+| Change | Why |
+|---|---|
+| **ACR off** (`com.amazon.tv.acr`) | Automatic Content Recognition identifies what's on your screen, including HDMI devices and antenna TV, for ad targeting. |
+| **Limit ad tracking** (Amazon and third-party apps) | Stops interest-based ad profiling. |
+| **Usage, marketing and app-usage uploads off** | Stops the device reporting how you use it. |
+| **Advertising ID service, telemetry, logging and Wi-Fi metrics disabled** | These run in the background and phone home. |
+| **Shopping, miniTV, demo content, tutorials, release notes, Luna hub, forced-update prompts disabled** | Bloat and nags. |
+| **Animations 1× → 0.5×** | Menus feel noticeably snappier. |
+| *Optional* `-RemoveApps` | Uninstalls preinstalled apps you don't use. Edit the list first, and reinstall any time from the Appstore. |
+
+Apps are **disabled, not deleted**, so `restore-firetv.ps1` brings everything back. A few packages are protected by Amazon and can't be disabled; the script skips them and tells you which.
+
+Two TV settings worth changing by hand:
+- **Settings → Preferences → Featured Content**: turn off video and audio autoplay.
+- **Settings → Display & Sounds → Sound Settings → Advanced → Volume Leveler**: *Mid*. It evens out ads that are mixed louder than the show, on every app.
+
+## 🚀 Setup
+
+**You need:** a Fire TV (built on Fire OS 8 / Android 11; Fire OS 7 should mostly work) and a Windows PC on the same network.
+
+1. **Turn on ADB on the TV.** Open Settings → My Fire TV → About, click the device name 7 times, then go to Developer Options → **ADB Debugging: On**.
+2. **Find the TV's IP**: Settings → My Fire TV → About → Network.
+3. **Get ADB.** Download Google's [platform-tools](https://developer.android.com/tools/releases/platform-tools) and unzip it.
+4. **Connect** with `adb connect <tv-ip>:5555`, and accept the *Allow debugging?* prompt on the TV with **Always allow** ticked.
+5. **Run what you want:**
+
+```powershell
+# Turn off ads, ACR and telemetry
+.\scripts\debloat-firetv.ps1 -TvIp 192.168.1.50 -Adb C:\path\to\platform-tools\adb.exe
+
+# Install Sakura Home (APK from the Releases page) and hand it the Home button
+.\scripts\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.0.apk -Adb C:\path\to\platform-tools\adb.exe
+```
+
+**Undo:** `restore-firetv.ps1` reverses the debloat, and `install-sakura-home.ps1 -Uninstall` removes the launcher.
+
+> After updating Sakura Home, run the install script again. Android unbinds accessibility services when their app is reinstalled.
+
+## 🛠️ Build from source
+
+```powershell
+cd app-launcher
+# needs JDK 17+ and the Android SDK (platform 36); point ANDROID_HOME at it
+.\gradlew.bat assembleRelease
+# -> app\build\outputs\apk\release\app-release.apk
+```
+
+The code is plain Kotlin and Android Views, with RecyclerView as the only library, so it stays light on TV hardware:
+
+```
+app-launcher/app/src/main/java/com/sakura/home/
+├── MainActivity.kt        home screen: video background, rows, inputs, menu, ambient mode
+├── CardAdapter.kt         app cards and their glow, zoom and light-sweep focus animation
+├── Apps.kt                finds installed apps and banners; saved favorites and hidden apps
+├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter
+└── AdMuter.kt             HBO Max ad-badge detection and mute/unmute
+```
+
+### Regenerating the artwork
+
+```powershell
+pip install pillow imageio-ffmpeg
+python artwork/generator/sakura.py artwork still          # wallpapers
+python artwork/generator/sakura.py artwork video 600      # 20 s / 30 fps seamless loop
+```
+
+Every motion in the animation (petal fall, sway, spin, the rays' rotation, sparkle twinkle, mist drift) is a whole number of cycles per loop, so the video repeats with no visible seam.
+
+## ⚠️ Notes
+
+- Tested on a Fire TV smart TV (MediaTek, Fire OS 8.1.8). Fire TV sticks and cubes use the same Fire OS, but their input names and package lists differ slightly.
+- The HBO Max detection depends on how the app draws its ad badge today. If HBO changes the design, the check needs updating (one color and one screen area in `AdMuter.kt`).
+- Turning off the main update service isn't possible without root, because Amazon protects it.
+- Not affiliated with Amazon, Warner Bros. Discovery or any streaming service. All trademarks belong to their owners. You use this at your own risk, though everything here can be undone.
+
+## License
+
+[MIT](LICENSE): the code and the sakura artwork are free to use, change and share.

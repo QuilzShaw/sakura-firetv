@@ -1,0 +1,17 @@
+<resources>
+    <color name="sakura_pink">#FFB7CF</color>
+    <color name="sakura_deep">#FF6FA0</color>
+    <color name="plum">#1E1226</color>
+    <color name="text_soft">#E8D9E4</color>
+
+    <style name="SakuraTheme" parent="android:Theme.DeviceDefault.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/sakura_still</item>
+        <item name="android:colorAccent">@color/sakura_deep</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Activity</item>
+    </style>
+
+    <style name="SakuraDialog" parent="android:Theme.DeviceDefault.Dialog.Alert">
+        <item name="android:colorAccent">@color/sakura_pink</item>
+        <item name="android:windowBackground">@drawable/dialog_bg</item>
+    </style>
+</resources>
