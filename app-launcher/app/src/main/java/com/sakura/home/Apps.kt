@@ -30,8 +30,18 @@ object Apps {
         "com.amazon.tv.livetv",
     )
 
-    // Clutter hidden until the user un-hides it: Luna and a bundle of European satellite apps
-    val defaultUserHidden = setOf("com.amazon.spiderpork", "com.mediatek.opapp")
+    // Clutter hidden until the user un-hides it: Luna, European satellite apps, Fire OS system screens
+    val defaultUserHidden = setOf(
+        "com.amazon.spiderpork",
+        "com.mediatek.opapp",
+        "com.amazon.ftv.profilepicker",
+        "com.amazon.tv.localgallery",
+        "com.android.documentsui",
+        "com.amazon.ssm",
+        "com.amazon.hedwig",
+        "com.amazon.tv.quicksettings.ui",
+        "com.amazon.ftv.screensaver",
+    )
 
     fun load(ctx: Context, userHidden: Set<String> = emptySet()): List<AppEntry> {
         val pm = ctx.packageManager

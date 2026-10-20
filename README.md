@@ -34,7 +34,27 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 
 ## 🏯 Sakura Home
 
-<!-- SCREENSHOTS -->
+<div align="center">
+<img src="docs/images/home.jpg" alt="Sakura Home: clock and greeting top-left, input buttons top-right, favorites row of YouTube, Netflix, Hulu, HBO Max and Prime Video" width="100%" />
+<br><sub>Home screen on a real Fire TV: greeting, clock, input buttons, favorites and all apps</sub>
+<br><br>
+<table>
+<tr>
+<td><img src="docs/images/focus-hulu.jpg" alt="The Hulu card zoomed in with a pink glow outline" /></td>
+<td><img src="docs/images/ambient.jpg" alt="Ambient mode: only the sakura scene and a large glowing clock" /></td>
+</tr>
+<tr>
+<td align="center"><sub>Selected cards zoom in with a pink glow and a light sweep</sub></td>
+<td align="center"><sub>Ambient mode after 3 idle minutes</sub></td>
+</tr>
+<tr>
+<td colspan="2"><img src="docs/images/inputs.jpg" alt="Top-right buttons for HDMI 1 to 4, Antenna and Menu, with HDMI 1 highlighted" /></td>
+</tr>
+<tr>
+<td colspan="2" align="center"><sub>One-press HDMI and antenna buttons, plus the ✿ Menu</sub></td>
+</tr>
+</table>
+</div>
 
 **Home screen**
 - 🌙 **Living background**: falling petals, a glowing textured moon with slowly turning light rays, twinkling sparkles, drifting valley mist, and large out-of-focus foreground petals for depth.
@@ -52,7 +72,7 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - After 3 minutes without a button press (or when you press **Back** on the home screen), the menus fade away and leave the sakura scene with a large glowing clock. Any button wakes it.
 
 **Behaves like a real home screen**
-- The **Home button** always lands on Sakura Home, including from inside apps.
+- The **Home button** always lands on Sakura Home with your first favorite selected, including from inside apps.
 - **Starts on boot.**
 - Pauses its video when an app opens, so streaming apps get the full video decoder.
 

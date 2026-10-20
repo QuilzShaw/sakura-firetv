@@ -41,6 +41,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
     private var allApps: List<AppEntry> = emptyList()
     private val handler = Handler(Looper.getMainLooper())
     private var ambientOn = false
+    private var homePressed = false
     private val enterAmbient = Runnable { setAmbient(true) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,10 +99,19 @@ class MainActivity : Activity(), CardAdapter.Listener {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // Home pressed while already home: wake up and jump back to the first favorite
+        // Home pressed: wake up and jump back to the first favorite once the window regains focus
         setAmbient(false)
-        favRow.scrollToPosition(0)
-        focusFirstFavorite()
+        homePressed = true
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Runs after Android restores the old focus, so this wins
+        if (hasFocus && homePressed) {
+            homePressed = false
+            favRow.scrollToPosition(0)
+            favRow.postDelayed({ focusFirstFavorite() }, 80)
+        }
     }
 
     private fun startVideo() {
