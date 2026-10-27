@@ -61,7 +61,7 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - 🕰️ **Glowing clock and date**, with a greeting that changes through the day (*Good morning* … *Sweet dreams*).
 - 💗 **Favorites row**: big banner cards that zoom in with a pink glow, a soft shadow and a light sweep when selected.
 - 🗂️ **All Apps row**: every installed app, with clutter hidden.
-- 📺 **TV input buttons**: one press for **HDMI 1–4** and **Antenna**, using your custom input names if you've set any. App-registered "inputs" are filtered out.
+- 📺 **TV input buttons**: one press for **HDMI 1–4**, using your custom input names if you've set any. App-registered "inputs" are filtered out. HDMI plays in Sakura Home's own full-screen player (Amazon's player only accepts Amazon-signed apps): a pink label names the input, *No signal* shows if the device is off, and **Back** returns home. **Antenna** opens Live TV settings to scan channels, because antenna playback is also locked to Amazon apps.
 - ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch and hidden apps.
 
 **Make it yours**
@@ -153,6 +153,7 @@ The code is plain Kotlin and Android Views, with RecyclerView as the only librar
 ```
 app-launcher/app/src/main/java/com/sakura/home/
 ├── MainActivity.kt        home screen: video background, rows, inputs, menu, ambient mode
+├── InputPlayerActivity.kt full-screen HDMI player built on Android's TvView
 ├── CardAdapter.kt         app cards and their glow, zoom and light-sweep focus animation
 ├── Apps.kt                finds installed apps and banners; saved favorites and hidden apps
 ├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter

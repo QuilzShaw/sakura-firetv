@@ -170,8 +170,9 @@ class MainActivity : Activity(), CardAdapter.Listener {
                 .sortedByDescending { it.id.contains("atsc", ignoreCase = true) }.take(1)
             hdmi.mapIndexed { i, info ->
                 val custom = info.loadCustomLabel(this)?.toString()?.takeIf { it.isNotBlank() }
-                (custom ?: "HDMI ${i + 1}") to { openInput(info) }
-            } + tuner.map { info -> "Antenna" to { openInput(info) } }
+                val label = custom ?: "HDMI ${i + 1}"
+                label to { openHdmi(info, label) }
+            } + tuner.map { _ -> "Antenna" to { openLiveTv() } }
         } catch (e: Exception) {
             emptyList()
         }
@@ -212,15 +213,22 @@ class MainActivity : Activity(), CardAdapter.Listener {
             .show()
     }
 
-    private fun openInput(info: TvInputInfo) {
-        val uri = if (info.isPassthroughInput) TvContract.buildChannelUriForPassthroughInput(info.id)
-        else TvContract.buildChannelsUriForInput(info.id)
-        val intent = Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    // Amazon's input player only accepts Amazon-signed callers, so HDMI plays in our own TvView
+    private fun openHdmi(info: TvInputInfo, label: String) {
+        startActivity(
+            Intent(this, InputPlayerActivity::class.java)
+                .putExtra(InputPlayerActivity.EXTRA_INPUT_ID, info.id)
+                .putExtra(InputPlayerActivity.EXTRA_LABEL, label)
+        )
+    }
+
+    // Amazon's Live TV player only accepts Amazon-signed callers; the channel list link opens
+    // Live TV settings instead, which is where antenna channels get scanned
+    private fun openLiveTv() {
         try {
-            startActivity(intent)
+            startActivity(Intent(Intent.ACTION_VIEW, TvContract.Channels.CONTENT_URI).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         } catch (e: Exception) {
-            packageManager.getLeanbackLaunchIntentForPackage("com.amazon.tv.livetv")?.let { startActivity(it) }
-                ?: Toast.makeText(this, "Couldn't open ${info.loadLabel(this)}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Live TV isn't available", Toast.LENGTH_SHORT).show()
         }
     }
 
