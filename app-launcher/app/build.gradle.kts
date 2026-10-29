@@ -18,8 +18,8 @@ android {
         applicationId = "com.sakura.home"
         minSdk = 28
         targetSdk = 30 // Fire OS 8 is Android 11
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
 
     compileOptions {

@@ -24,6 +24,13 @@ Write-Host "Privacy: limit ad tracking, stop usage and marketing data uploads" -
 foreach ($k in 'limit_ad_tracking', 'amz_limit_ad_tracking', 'non_amz_limit_ad_tracking') { Tv "settings put secure $k 1" }
 foreach ($k in 'USAGE_METRICS_UPLOAD_ENABLED', 'usage_metrics_marketing_enabled', 'pact_usage_collection_enabled') { Tv "settings put secure $k 0" }
 
+Write-Host "Power: never sleep on its own, and ignore standby requests from HDMI devices" -ForegroundColor Magenta
+# Fire OS counts only remote presses as activity, so it powers off mid-session on a PC or console
+Tv "settings put secure sleep_timeout 2147460000"
+Tv "settings put system screen_off_timeout 2147460000"
+Tv "settings put global stay_on_while_plugged_in 7"
+Tv "settings put secure block_cec_standby 1"
+
 Write-Host "Speed: animations 1x -> 0.5x" -ForegroundColor Magenta
 foreach ($k in 'window_animation_scale', 'transition_animation_scale', 'animator_duration_scale') { Tv "settings put global $k 0.5" }
 
@@ -45,6 +52,12 @@ $disable = @(
     'com.amazon.smarthomemapviewapp'        # Alexa smart-home map
     'com.amazon.tv.forcedotaupdater.v2'     # forced update prompts
     'com.amazon.tv.easyupgrade'             # upgrade nags
+    'com.amazon.kso.blackbird'              # "Special Offers" ad delivery
+    'com.amazon.media.recommendations'      # sponsored recommendations
+    'com.amazon.ftv.screensaver'            # screensaver that shows ads
+    'com.amazon.vizzini'                    # Ambient Experience (ad and promo cards when idle)
+    'com.amazon.aca'                        # promotional notifications
+    'com.amazon.bueller.photos'             # Amazon Photos promo
 )
 Write-Host "Disabling ad, telemetry and nag apps" -ForegroundColor Magenta
 foreach ($p in $disable) {

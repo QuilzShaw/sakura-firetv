@@ -7,6 +7,7 @@ import android.media.tv.TvView
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.TextView
 
 /**
@@ -29,6 +30,8 @@ class InputPlayerActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_player)
+        // Using a PC or console over HDMI never touches the remote, so keep the TV awake
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         tv = findViewById(R.id.tvView)
         label = findViewById(R.id.inputLabel)
         status = findViewById(R.id.inputStatus)

@@ -61,7 +61,7 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - 🕰️ **Glowing clock and date**, with a greeting that changes through the day (*Good morning* … *Sweet dreams*).
 - 💗 **Favorites row**: big banner cards that zoom in with a pink glow, a soft shadow and a light sweep when selected.
 - 🗂️ **All Apps row**: every installed app, with clutter hidden.
-- 📺 **TV input buttons**: one press for **HDMI 1–4**, using your custom input names if you've set any. App-registered "inputs" are filtered out. HDMI plays in Sakura Home's own full-screen player (Amazon's player only accepts Amazon-signed apps): a pink label names the input, *No signal* shows if the device is off, and **Back** returns home. **Antenna** opens Live TV settings to scan channels, because antenna playback is also locked to Amazon apps.
+- 📺 **TV input buttons**: one press for **HDMI 1–4**, using your custom input names if you've set any. App-registered "inputs" are filtered out. HDMI plays in Sakura Home's own full-screen player (Amazon's player only accepts Amazon-signed apps): a pink label names the input, *No signal* shows if the device is off, the TV stays awake however long you use it, and **Back** returns home. **Antenna** opens Live TV settings to scan channels, because antenna playback is also locked to Amazon apps.
 - ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch and hidden apps.
 
 **Make it yours**
@@ -107,7 +107,9 @@ You might see a brief flash of Amazon's screen when you press Home; that's Fire 
 | **Limit ad tracking** (Amazon and third-party apps) | Stops interest-based ad profiling. |
 | **Usage, marketing and app-usage uploads off** | Stops the device reporting how you use it. |
 | **Advertising ID service, telemetry, logging and Wi-Fi metrics disabled** | These run in the background and phone home. |
+| **"Special Offers" ad service, sponsored recommendations, ad screensaver, Ambient Experience and promo notifications disabled** | The rest of Amazon's own ads. |
 | **Shopping, miniTV, demo content, tutorials, release notes, Luna hub, forced-update prompts disabled** | Bloat and nags. |
+| **Never sleeps on its own**; HDMI devices can't put it in standby | Fire OS only counts remote presses as activity, so it switched off after 14 minutes on a PC or console. Turn it off yourself with the power button. |
 | **Animations 1× → 0.5×** | Menus feel noticeably snappier. |
 | *Optional* `-RemoveApps` | Uninstalls preinstalled apps you don't use. Edit the list first, and reinstall any time from the Appstore. |
 
