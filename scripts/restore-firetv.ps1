@@ -23,6 +23,10 @@ $pkgs = 'com.amazon.tv.acr', 'com.amazon.hybridadidservice', 'com.amazon.dp.logg
         'com.amazon.kso.blackbird', 'com.amazon.media.recommendations', 'com.amazon.ftv.screensaver',
         'com.amazon.vizzini', 'com.amazon.aca', 'com.amazon.bueller.photos'
 foreach ($p in $pkgs) { Tv "pm enable $p" | Out-Null }
+foreach ($p in 'com.amazon.ftvads.deeplinking', 'com.amazon.client.metrics') {
+    Tv "pm unsuspend --user 0 $p" | Out-Null
+    Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND allow" | Out-Null
+}
 
 foreach ($k in 'limit_ad_tracking', 'amz_limit_ad_tracking', 'non_amz_limit_ad_tracking') { Tv "settings put secure $k 0" }
 foreach ($k in 'USAGE_METRICS_UPLOAD_ENABLED', 'usage_metrics_marketing_enabled', 'pact_usage_collection_enabled') { Tv "settings put secure $k 1" }

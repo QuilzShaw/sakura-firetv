@@ -24,6 +24,12 @@ Write-Host "Privacy: limit ad tracking, stop usage and marketing data uploads" -
 foreach ($k in 'limit_ad_tracking', 'amz_limit_ad_tracking', 'non_amz_limit_ad_tracking') { Tv "settings put secure $k 1" }
 foreach ($k in 'USAGE_METRICS_UPLOAD_ENABLED', 'usage_metrics_marketing_enabled', 'pact_usage_collection_enabled') { Tv "settings put secure $k 0" }
 
+Write-Host "Suspending Amazon's protected ad and metrics apps (they can't be disabled)" -ForegroundColor Magenta
+foreach ($p in 'com.amazon.ftvads.deeplinking', 'com.amazon.client.metrics') {
+    Tv "pm suspend --user 0 $p"
+    Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND ignore"
+}
+
 Write-Host "Power: never sleep on its own, and ignore standby requests from HDMI devices" -ForegroundColor Magenta
 # Fire OS counts only remote presses as activity, so it powers off mid-session on a PC or console
 Tv "settings put secure sleep_timeout 2147460000"

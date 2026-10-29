@@ -113,7 +113,7 @@ You might see a brief flash of Amazon's screen when you press Home; that's Fire 
 | **Animations 1× → 0.5×** | Menus feel noticeably snappier. |
 | *Optional* `-RemoveApps` | Uninstalls preinstalled apps you don't use. Edit the list first, and reinstall any time from the Appstore. |
 
-Apps are **disabled, not deleted**, so `restore-firetv.ps1` brings everything back. A few packages are protected by Amazon and can't be disabled; the script skips them and tells you which.
+Apps are **disabled, not deleted**, so `restore-firetv.ps1` brings everything back. Amazon protects its ad deep-link service and its metrics client from being disabled, so the script *suspends* them instead: they can't open screens or run in the background. All of this survives a restart.
 
 Two TV settings worth changing by hand:
 - **Settings → Preferences → Featured Content**: turn off video and audio autoplay.
