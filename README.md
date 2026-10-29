@@ -62,7 +62,9 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - 💗 **Favorites row**: big banner cards that zoom in with a pink glow, a soft shadow and a light sweep when selected.
 - 🗂️ **All Apps row**: every installed app, with clutter hidden.
 - 📺 **TV input buttons**: one press for **HDMI 1–4**, using your custom input names if you've set any. App-registered "inputs" are filtered out. HDMI plays in Sakura Home's own full-screen player (Amazon's player only accepts Amazon-signed apps): a pink label names the input, *No signal* shows if the device is off, the TV stays awake however long you use it, and **Back** returns home. **Antenna** opens Live TV settings to scan channels, because antenna playback is also locked to Amazon apps.
-- ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch and hidden apps.
+- ⌕ **Search**: type a few letters to open a matching app, or jump to HBO Max's search page. For shows and movies, hold the remote's **Alexa** button and say what you want; it searches inside every app. (Amazon's search screen only accepts Amazon-signed apps, and YouTube, Hulu and Prime Video ignore search words sent by other apps.)
+- ▢ **Open apps**: like a phone's recents. The button shows how many apps are open; pick one to close it, or **Close all**, to free memory on the TV's small 1.8 GB. Holding OK on a card also offers **Close app**, and ✿ Menu can close everything automatically when you press Home. Fire OS ignores the normal "close app" request from other apps, so Sakura Home presses **Force stop** in each app's settings page for you, behind a sakura cover screen. Netflix is the exception: Fire OS keeps it running itself, so it stays open.
+- ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch, auto-close and hidden apps.
 
 **Make it yours**
 - Hold **OK** on any app to **add it to favorites, move it left or right, remove it, or hide it**.
@@ -93,11 +95,10 @@ It only undoes a mute it made itself, so if you mute the TV yourself it stays mu
 
 ### How the Home button takeover works
 
-Fire OS doesn't let you change the default launcher, so Sakura Home uses an **accessibility service**. When Amazon's home screen comes to the front, it opens Sakura Home on top. Two details make this work well:
+Fire OS doesn't let you change the default launcher, so Sakura Home uses an **accessibility service**. It catches the remote's Home button itself, so Amazon's home screen (and the ads it autoplays) never opens. If Amazon's home does come up some other way, such as at startup, Sakura Home opens on top within a fraction of a second. A few details make this work well:
+- **Hold Home** to open Fire TV settings. Amazon's quick-settings panel only accepts Amazon-signed apps, so this replaces it.
 - Fire OS hosts its main **Settings** screen inside Amazon's home app, so Sakura Home briefly allows it whenever you open Settings. Otherwise you could never reach them.
-- It only acts on Amazon's *home* activity, so Amazon search, profiles and **long-press Home** (quick settings) still work.
-
-You might see a brief flash of Amazon's screen when you press Home; that's Fire OS drawing it before Sakura Home can step in.
+- It only acts on Amazon's *home* activity, so Alexa, Amazon search and profiles still work.
 
 ## 🧹 What the debloat script changes
 
@@ -107,7 +108,7 @@ You might see a brief flash of Amazon's screen when you press Home; that's Fire 
 | **Limit ad tracking** (Amazon and third-party apps) | Stops interest-based ad profiling. |
 | **Usage, marketing and app-usage uploads off** | Stops the device reporting how you use it. |
 | **Advertising ID service, telemetry, logging and Wi-Fi metrics disabled** | These run in the background and phone home. |
-| **"Special Offers" ad service, sponsored recommendations, ad screensaver, Ambient Experience and promo notifications disabled** | The rest of Amazon's own ads. |
+| **"Special Offers" ad service, sponsored recommendations, ad screensaver and promo notifications disabled** | The rest of Amazon's own ads. (Ambient Experience stays on because it also draws Alexa's voice search; with sleep and the screensaver off, its idle ad cards never come up.) |
 | **Shopping, miniTV, demo content, tutorials, release notes, Luna hub, forced-update prompts disabled** | Bloat and nags. |
 | **Never sleeps on its own**; HDMI devices can't put it in standby | Fire OS only counts remote presses as activity, so it switched off after 14 minutes on a PC or console. Turn it off yourself with the power button. |
 | **Animations 1× → 0.5×** | Menus feel noticeably snappier. |
@@ -134,7 +135,7 @@ Two TV settings worth changing by hand:
 .\scripts\debloat-firetv.ps1 -TvIp 192.168.1.50 -Adb C:\path\to\platform-tools\adb.exe
 
 # Install Sakura Home (APK from the Releases page) and hand it the Home button
-.\scripts\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.0.apk -Adb C:\path\to\platform-tools\adb.exe
+.\scripts\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.3.apk -Adb C:\path\to\platform-tools\adb.exe
 ```
 
 **Undo:** `restore-firetv.ps1` reverses the debloat, and `install-sakura-home.ps1 -Uninstall` removes the launcher.
@@ -158,7 +159,10 @@ app-launcher/app/src/main/java/com/sakura/home/
 ├── InputPlayerActivity.kt full-screen HDMI player built on Android's TvView
 ├── CardAdapter.kt         app cards and their glow, zoom and light-sweep focus animation
 ├── Apps.kt                finds installed apps and banners; saved favorites and hidden apps
+├── OpenApps.kt            recents list and closing apps
+├── SearchDialog.kt        search box: matching apps plus HBO Max's search page
 ├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter
+├── AppCloser.kt           closes apps by pressing Force stop in their settings page
 └── AdMuter.kt             HBO Max ad-badge detection and mute/unmute
 ```
 

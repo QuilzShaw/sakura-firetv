@@ -21,7 +21,7 @@ $pkgs = 'com.amazon.tv.acr', 'com.amazon.hybridadidservice', 'com.amazon.dp.logg
         'com.amazon.minitv.android.app', 'com.amazon.tv.releasenotes', 'com.amazon.gamehub',
         'com.amazon.smarthomemapviewapp', 'com.amazon.tv.forcedotaupdater.v2', 'com.amazon.tv.easyupgrade',
         'com.amazon.kso.blackbird', 'com.amazon.media.recommendations', 'com.amazon.ftv.screensaver',
-        'com.amazon.vizzini', 'com.amazon.aca', 'com.amazon.bueller.photos'
+        'com.amazon.aca', 'com.amazon.bueller.photos'
 foreach ($p in $pkgs) { Tv "pm enable $p" | Out-Null }
 foreach ($p in 'com.amazon.ftvads.deeplinking', 'com.amazon.client.metrics') {
     Tv "pm unsuspend --user 0 $p" | Out-Null

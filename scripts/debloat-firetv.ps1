@@ -61,7 +61,6 @@ $disable = @(
     'com.amazon.kso.blackbird'              # "Special Offers" ad delivery
     'com.amazon.media.recommendations'      # sponsored recommendations
     'com.amazon.ftv.screensaver'            # screensaver that shows ads
-    'com.amazon.vizzini'                    # Ambient Experience (ad and promo cards when idle)
     'com.amazon.aca'                        # promotional notifications
     'com.amazon.bueller.photos'             # Amazon Photos promo
 )

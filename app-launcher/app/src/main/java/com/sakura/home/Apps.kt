@@ -82,6 +82,10 @@ class Prefs(ctx: Context) {
         get() = sp.getBoolean("mute_hbo_ads", true)
         set(value) = sp.edit().putBoolean("mute_hbo_ads", value).apply()
 
+    var closeOnHome: Boolean
+        get() = sp.getBoolean("close_on_home", false)
+        set(value) = sp.edit().putBoolean("close_on_home", value).apply()
+
     var hiddenApps: Set<String>
         get() = sp.getStringSet("hidden", null) ?: Apps.defaultUserHidden
         set(value) = sp.edit().putStringSet("hidden", value).apply()

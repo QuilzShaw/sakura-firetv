@@ -3,7 +3,7 @@
   Installs Sakura Home on a Fire TV and hands it the Home button.
 
 .EXAMPLE
-  .\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.0.apk
+  .\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.3.apk
 
 .NOTES
   Fire OS won't let you change the default launcher, so Sakura Home uses an accessibility
@@ -13,7 +13,7 @@
 #>
 param(
     [Parameter(Mandatory)] [string]$TvIp,
-    [string]$Apk = "SakuraHome-1.0.apk",
+    [string]$Apk = "SakuraHome-1.3.apk",
     [string]$Adb = "adb",
     [switch]$Uninstall
 )
@@ -30,7 +30,8 @@ if ($Uninstall) {
 }
 
 & $Adb -s $target install -r $Apk
-& $Adb -s $target shell "settings put secure enabled_accessibility_services $service"
+# Clear it first: setting the same value again doesn't rebind the updated service
+& $Adb -s $target shell "settings put secure enabled_accessibility_services ''; sleep 1; settings put secure enabled_accessibility_services $service"
 & $Adb -s $target shell "settings put secure accessibility_enabled 1"
 & $Adb -s $target shell "am start -n com.sakura.home/.MainActivity" | Out-Null
 Write-Host "Sakura Home installed and set as the Home button. Press Home on the remote to try it." -ForegroundColor Green

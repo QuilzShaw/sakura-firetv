@@ -38,6 +38,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
     private lateinit var favAdapter: CardAdapter
     private lateinit var appsAdapter: CardAdapter
 
+    private lateinit var openAppsPill: TextView
     private var allApps: List<AppEntry> = emptyList()
     private val handler = Handler(Looper.getMainLooper())
     private var ambientOn = false
@@ -81,6 +82,8 @@ class MainActivity : Activity(), CardAdapter.Listener {
     override fun onResume() {
         super.onResume()
         greeting.text = greetingText()
+        if (prefs.closeOnHome && OpenApps.list(this).isNotEmpty()) closeApps(OpenApps.list(this))
+        updateOpenAppsPill()
         reloadApps()
         if (favRow.focusedChild == null && appsRow.focusedChild == null) focusFirstFavorite()
         resetIdle()
@@ -155,9 +158,43 @@ class MainActivity : Activity(), CardAdapter.Listener {
     private fun buildPills() {
         val bar = findViewById<LinearLayout>(R.id.pills)
         bar.removeAllViews()
+        bar.addView(pill("⌕  Search") { SearchDialog(this, allApps) { open(it) }.show() })
         inputs().forEach { (label, action) -> bar.addView(pill(label, action)) }
+        openAppsPill = pill("") { showOpenApps() }
+        bar.addView(openAppsPill)
         bar.addView(pill("✿  Menu") { showMenu() })
     }
+
+    // Shown only while something is open, with the count, like a phone's recents button
+    private fun updateOpenAppsPill() {
+        val n = OpenApps.list(this).size
+        openAppsPill.text = "▢  $n open"
+        openAppsPill.visibility = if (n > 0) View.VISIBLE else View.GONE
+    }
+
+    private fun showOpenApps() {
+        val pkgs = OpenApps.list(this)
+        if (pkgs.isEmpty()) return
+        val names = pkgs.map { labelOf(it) }
+        val options = names.map { "✕  Close $it" } + "✕  Close all"
+        AlertDialog.Builder(this, R.style.SakuraDialog)
+            .setTitle("Open apps")
+            .setItems(options.toTypedArray()) { _, which ->
+                closeApps(if (which == pkgs.size) pkgs else listOf(pkgs[which]))
+            }
+            .show()
+    }
+
+    // The Home button service closes them and brings us back here
+    private fun closeApps(pkgs: List<String>) {
+        if (!OpenApps.close(this, pkgs)) {
+            Toast.makeText(this, "Turn on the Sakura Home button service to close apps", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun labelOf(pkg: String): String =
+        try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }
+        catch (e: Exception) { pkg }
 
     // Only the TV's physical inputs: HDMI ports and the antenna tuner (apps register their own "inputs" too)
     private fun inputs(): List<Pair<String, () -> Unit>> {
@@ -190,6 +227,10 @@ class MainActivity : Activity(), CardAdapter.Listener {
                 prefs.muteHboAds = !prefs.muteHboAds
                 Toast.makeText(this, if (prefs.muteHboAds) "HBO Max ads will be muted" else "HBO Max ad muting off", Toast.LENGTH_SHORT).show()
             },
+            (if (prefs.closeOnHome) "▢  Close apps when I press Home: On" else "▢  Close apps when I press Home: Off") to {
+                prefs.closeOnHome = !prefs.closeOnHome
+                Toast.makeText(this, if (prefs.closeOnHome) "Apps will close when you go Home" else "Apps stay open until you close them", Toast.LENGTH_SHORT).show()
+            },
         )
         if (hidden.isNotEmpty()) options += "Show hidden apps (${hidden.size})" to { showHidden() }
         AlertDialog.Builder(this, R.style.SakuraDialog)
@@ -200,10 +241,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
 
     private fun showHidden() {
         val pkgs = prefs.hiddenApps.toList().sorted()
-        val names = pkgs.map { pkg ->
-            try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }
-            catch (e: Exception) { pkg }
-        }
+        val names = pkgs.map { labelOf(it) }
         AlertDialog.Builder(this, R.style.SakuraDialog)
             .setTitle("Tap an app to show it again")
             .setItems(names.toTypedArray()) { _, which ->
@@ -266,13 +304,15 @@ class MainActivity : Activity(), CardAdapter.Listener {
     }
 
     override fun onClicked(app: AppEntry, view: View) {
-        view.animate().scaleX(0.96f).scaleY(0.96f).setDuration(90).withEndAction {
-            try {
-                startActivity(app.launch)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Couldn't open ${app.label}", Toast.LENGTH_SHORT).show()
-            }
-        }.start()
+        view.animate().scaleX(0.96f).scaleY(0.96f).setDuration(90).withEndAction { open(app) }.start()
+    }
+
+    private fun open(app: AppEntry) {
+        try {
+            startActivity(app.launch)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Couldn't open ${app.label}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onLongClicked(app: AppEntry, row: CardAdapter) {
@@ -292,6 +332,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
                 focusFirstFavorite()
             }
         }
+        if (app.pkg in OpenApps.list(this)) options += "✕  Close app" to { closeApps(listOf(app.pkg)) }
         options += "App info" to {
             startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.pkg}")))
         }
