@@ -11,7 +11,7 @@ import android.view.accessibility.AccessibilityEvent
  * Fire OS won't let another app become the default home screen, so this watches for
  * Amazon's home activity coming to the front and immediately opens Sakura Home instead.
  * Also starts Sakura Home at boot, since the system connects this service on startup,
- * and drives [AdMuter] while HBO Max is on screen.
+ * and drives [AdMuter] while HBO Max or Hulu is on screen.
  */
 class HomeButtonService : AccessibilityService() {
 
@@ -51,8 +51,10 @@ class HomeButtonService : AccessibilityService() {
         instance = this
         // Take over right after boot, or if Amazon's home is showing (e.g. Sakura was just
         // updated), but never when the service is re-enabled mid-show
-        val onAmazonHome = rootInActiveWindow?.packageName?.toString() in amazonHome
-        if (SystemClock.elapsedRealtime() < 3 * 60 * 1000 || onAmazonHome) goHome()
+        val front = rootInActiveWindow?.packageName?.toString()
+        if (SystemClock.elapsedRealtime() < 3 * 60 * 1000 || front in amazonHome) goHome()
+        // Already mid-show in HBO Max or Hulu: start watching for ads without waiting for a screen change
+        else front?.let { adMuter.setForeground(it) }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {

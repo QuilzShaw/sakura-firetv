@@ -223,9 +223,9 @@ class MainActivity : Activity(), CardAdapter.Listener {
                 startActivity(Intent(Settings.ACTION_SETTINGS))
             },
             "☾  Ambient mode now" to { setAmbient(true) },
-            (if (prefs.muteHboAds) "🔇  Mute HBO Max ads: On" else "🔈  Mute HBO Max ads: Off") to {
+            (if (prefs.muteHboAds) "🔇  Mute HBO Max & Hulu ads: On" else "🔈  Mute HBO Max & Hulu ads: Off") to {
                 prefs.muteHboAds = !prefs.muteHboAds
-                Toast.makeText(this, if (prefs.muteHboAds) "HBO Max ads will be muted" else "HBO Max ad muting off", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, if (prefs.muteHboAds) "HBO Max and Hulu ads will be muted" else "Ad muting off", Toast.LENGTH_SHORT).show()
             },
             (if (prefs.closeOnHome) "▢  Close apps when I press Home: On" else "▢  Close apps when I press Home: Off") to {
                 prefs.closeOnHome = !prefs.closeOnHome

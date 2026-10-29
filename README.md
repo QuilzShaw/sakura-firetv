@@ -28,7 +28,7 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 | | Part | What it does |
 |---|---|---|
 | 🏯 | [**Sakura Home**](app-launcher) | A custom launcher app with an animated cherry blossom scene, your apps as glowing cards, one-press TV inputs and an ambient clock mode. It takes over the Home button. |
-| 🔇 | **HBO Max ad muting** | Built into Sakura Home: it mutes the TV during HBO Max ad breaks and unmutes when the show comes back. |
+| 🔇 | **HBO Max & Hulu ad muting** | Built into Sakura Home: it mutes the TV during HBO Max and Hulu ad breaks and unmutes when the show comes back. |
 | 🧹 | [**Debloat scripts**](scripts) | Turn off ad tracking, Automatic Content Recognition (ACR), telemetry and nag apps, and speed up the UI. Includes a one-command undo. |
 | 🎨 | [**Artwork generator**](artwork/generator) | The Python script that paints the wallpaper and renders the looping petal animation. |
 
@@ -64,7 +64,7 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - 📺 **TV input buttons**: one press for **HDMI 1–4**, using your custom input names if you've set any. App-registered "inputs" are filtered out. HDMI plays in Sakura Home's own full-screen player (Amazon's player only accepts Amazon-signed apps): a pink label names the input, *No signal* shows if the device is off, the TV stays awake however long you use it, and **Back** returns home. **Antenna** opens Live TV settings to scan channels, because antenna playback is also locked to Amazon apps.
 - ⌕ **Search**: type a few letters to open a matching app, or jump to HBO Max's search page. For shows and movies, hold the remote's **Alexa** button and say what you want; it searches inside every app. (Amazon's search screen only accepts Amazon-signed apps, and YouTube, Hulu and Prime Video ignore search words sent by other apps.)
 - ▢ **Open apps**: like a phone's recents. The button shows how many apps are open; pick one to close it, or **Close all**, to free memory on the TV's small 1.8 GB. Holding OK on a card also offers **Close app**, and ✿ Menu can close everything automatically when you press Home. Fire OS ignores the normal "close app" request from other apps, so Sakura Home presses **Force stop** in each app's settings page for you, behind a sakura cover screen. Netflix is the exception: Fire OS keeps it running itself, so it stays open.
-- ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max ad-mute switch, auto-close and hidden apps.
+- ✿ **Menu**: Fire TV settings, ambient mode, the HBO Max & Hulu ad-mute switch, auto-close and hidden apps.
 
 **Make it yours**
 - Hold **OK** on any app to **add it to favorites, move it left or right, remove it, or hide it**.
@@ -78,18 +78,18 @@ Fire TVs ship with a home screen full of sponsored rows, autoplaying trailers an
 - **Starts on boot.**
 - Pauses its video when an app opens, so streaming apps get the full video decoder.
 
-### 🔇 HBO Max ad muting
+### 🔇 HBO Max & Hulu ad muting
 
-HBO Max exposes nothing that other apps can read: no "now playing" info, no readable on-screen text, and no standard audio player. During an ad break, though, it always draws the same bright yellow badge in the top-left corner:
+HBO Max and Hulu expose nothing that other apps can read: no "now playing" info, no readable on-screen text, and no standard audio player. During an ad break, though, each always draws the same yellow badge in a fixed corner: top-left on HBO Max, top-right next to the countdown on Hulu.
 
-<div align="center"><img src="docs/images/hbo-ad-badge.png" alt="HBO Max ad badge: a yellow 'Ad' label followed by '1 of 1 :24'" width="420" /></div>
+<div align="center"><img src="docs/images/hbo-ad-badge.png" alt="HBO Max ad badge: a yellow 'Ad' label followed by '1 of 1 :24'" width="420" />&nbsp;&nbsp;<img src="docs/images/hulu-ad-badge.png" alt="Hulu ad badge: a countdown '0:48' followed by a yellow 'Ad' label" width="280" /></div>
 
-The video itself is copy-protected and shows up black in screenshots, but this badge doesn't. So while HBO Max is in front, Sakura Home checks that small corner **once a second**:
+The video itself is copy-protected and shows up black in screenshots, but this badge doesn't. So while either app is in front, Sakura Home checks that small corner **once a second**:
 
 1. **Badge appears**: it mutes the TV and shows a small pink **✿ Ad muted** tag.
 2. **Badge is gone for 2 seconds**: it unmutes.
 
-It only undoes a mute it made itself, so if you mute the TV yourself it stays muted. Nothing is recorded or sent anywhere; each check looks at a few thousand pixels and throws them away. You can switch it off in ✿ Menu. ✅ Tested on real HBO Max ad breaks.
+It only undoes a mute it made itself, so if you mute the TV yourself it stays muted. Nothing is recorded or sent anywhere; each check looks at a few thousand pixels and throws them away. You can switch it off in ✿ Menu. ✅ Tested on real HBO Max and Hulu ad breaks.
 
 > This only mutes your own speakers. Ads still play, nothing is skipped or blocked, and your subscription works exactly as before.
 
@@ -163,7 +163,7 @@ app-launcher/app/src/main/java/com/sakura/home/
 ├── SearchDialog.kt        search box: matching apps plus HBO Max's search page
 ├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter
 ├── AppCloser.kt           closes apps by pressing Force stop in their settings page
-└── AdMuter.kt             HBO Max ad-badge detection and mute/unmute
+└── AdMuter.kt             HBO Max and Hulu ad-badge detection and mute/unmute
 ```
 
 ### Regenerating the artwork
@@ -179,7 +179,7 @@ Every motion in the animation (petal fall, sway, spin, the rays' rotation, spark
 ## ⚠️ Notes
 
 - Tested on a Fire TV smart TV (MediaTek, Fire OS 8.1.8). Fire TV sticks and cubes use the same Fire OS, but their input names and package lists differ slightly.
-- The HBO Max detection depends on how the app draws its ad badge today. If HBO changes the design, the check needs updating (one color and one screen area in `AdMuter.kt`).
+- The ad detection depends on how HBO Max and Hulu draw their ad badges today. If either changes the design, the check needs updating (one color and one screen area in `AdMuter.kt`).
 - Turning off the main update service isn't possible without root, because Amazon protects it.
 - Not affiliated with Amazon, Warner Bros. Discovery or any streaming service. All trademarks belong to their owners. You use this at your own risk, though everything here can be undone.
 
