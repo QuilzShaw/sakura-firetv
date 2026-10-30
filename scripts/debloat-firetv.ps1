@@ -31,6 +31,12 @@ foreach ($p in 'com.amazon.ftvads.deeplinking', 'com.amazon.client.metrics', 'co
     Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND ignore"
 }
 
+Write-Host "Keeping big Amazon services out of memory while you watch (they still open when needed)" -ForegroundColor Magenta
+# Live TV alone holds ~120 MB in the background; Hulu streams 4K and needs ~750 MB on a 1.8 GB TV
+foreach ($p in 'com.amazon.tv.livetv', 'com.amazon.device.messaging', 'com.amazon.prism.android.service', 'com.amazon.imp') {
+    Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND ignore"
+}
+
 Write-Host "Power: never sleep on its own, and ignore standby requests from HDMI devices" -ForegroundColor Magenta
 # Fire OS counts only remote presses as activity, so it powers off mid-session on a PC or console
 Tv "settings put secure sleep_timeout 2147460000"

@@ -29,6 +29,10 @@ foreach ($p in 'com.amazon.ftvads.deeplinking', 'com.amazon.client.metrics', 'co
     Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND allow" | Out-Null
 }
 
+foreach ($p in 'com.amazon.tv.livetv', 'com.amazon.device.messaging', 'com.amazon.prism.android.service', 'com.amazon.imp') {
+    Tv "cmd appops set $p RUN_ANY_IN_BACKGROUND allow" | Out-Null
+}
+
 foreach ($k in 'limit_ad_tracking', 'amz_limit_ad_tracking', 'non_amz_limit_ad_tracking') { Tv "settings put secure $k 0" }
 foreach ($k in 'USAGE_METRICS_UPLOAD_ENABLED', 'usage_metrics_marketing_enabled', 'pact_usage_collection_enabled') { Tv "settings put secure $k 1" }
 foreach ($k in 'window_animation_scale', 'transition_animation_scale', 'animator_duration_scale') { Tv "settings put global $k 1.0" }
