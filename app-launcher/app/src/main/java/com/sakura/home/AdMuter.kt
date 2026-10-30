@@ -41,7 +41,9 @@ class AdMuter(private val service: AccessibilityService) {
             "com.hulu.plus" to Badge(0.926f, 0.950f, 0.056f, 0.088f, minGreen = 160, share = 0.5f, clearChecks = 5),
         )
 
-        private const val CHECK_MS = 1000L
+        // Each check copies a full screenshot, so look less often until an ad is found
+        private const val CHECK_MS = 1500L
+        private const val CHECK_MS_IN_AD = 1000L
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -50,7 +52,7 @@ class AdMuter(private val service: AccessibilityService) {
     private var running = false
     private var current: Badge? = null
     // Saved, so that if the service restarts mid-ad the new one still knows to unmute
-    private val state = service.getSharedPreferences("sakura", Context.MODE_PRIVATE)
+    private val state = service.getSharedPreferences("sakura_ad_muter", Context.MODE_PRIVATE)
     private var weMuted: Boolean
         get() = state.getBoolean("ad_muted", false)
         set(value) { state.edit().putBoolean("ad_muted", value).commit() }
@@ -82,7 +84,7 @@ class AdMuter(private val service: AccessibilityService) {
                     override fun onFailure(errorCode: Int) {}
                 })
             }
-            handler.postDelayed(this, CHECK_MS)
+            handler.postDelayed(this, if (weMuted) CHECK_MS_IN_AD else CHECK_MS)
         }
     }
 

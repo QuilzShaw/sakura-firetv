@@ -76,6 +76,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
 
     override fun onStart() {
         super.onStart()
+        video.visibility = View.VISIBLE
         startVideo()
     }
 
@@ -98,6 +99,8 @@ class MainActivity : Activity(), CardAdapter.Listener {
         super.onStop()
         // Release the video decoder so the app being launched can use it
         video.stopPlayback()
+        // Hiding it also frees its full-screen video buffers, which streaming apps need on 1.8 GB
+        video.visibility = View.GONE
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -127,8 +130,19 @@ class MainActivity : Activity(), CardAdapter.Listener {
         video.setOnErrorListener { _, _, _ -> video.visibility = View.GONE; true }
     }
 
+    // Android counts app installs/updates/removals; skip reloading (and re-decoding every
+    // banner) when nothing changed since last time
+    private var appsSeq = -1
+    private var appsHidden: Set<String>? = null
+
     private fun reloadApps() {
-        allApps = Apps.load(this, prefs.hiddenApps)
+        val hidden = prefs.hiddenApps
+        val changed = appsSeq < 0 || hidden != appsHidden || packageManager.getChangedPackages(appsSeq) != null
+        if (changed) {
+            appsSeq = packageManager.getChangedPackages(0)?.sequenceNumber ?: 0
+            appsHidden = hidden
+            allApps = Apps.load(this, hidden)
+        }
         val byPkg = allApps.associateBy { it.pkg }
         favAdapter.items = prefs.favorites.mapNotNull { byPkg[it] }
         appsAdapter.items = allApps
@@ -219,7 +233,7 @@ class MainActivity : Activity(), CardAdapter.Listener {
         val hidden = prefs.hiddenApps
         val options = mutableListOf<Pair<String, () -> Unit>>(
             "⚙  Fire TV settings" to {
-                HomeButtonService.allowAmazonHomeBriefly()
+                HomeButtonService.allowAmazonHomeBriefly(this)
                 startActivity(Intent(Settings.ACTION_SETTINGS))
             },
             "☾  Ambient mode now" to { setAmbient(true) },

@@ -7,6 +7,7 @@ import android.content.Context
  * Android 11 hides other apps' processes, so [HomeButtonService] records each app as it comes
  * to the front. Fire OS ignores the normal "close background app" request from other apps,
  * so closing goes through [HomeButtonService.forceStop], which presses Force stop for us.
+ * Only the service writes this list (in its own process); the home screen just reads it.
  */
 object OpenApps {
     private const val KEY = "open_apps"
@@ -34,18 +35,18 @@ object OpenApps {
     fun list(ctx: Context): List<String> =
         prefs(ctx).getString(KEY, null)?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
 
-    /** Returns false if the Home button service isn't running, so nothing could be closed. */
-    fun close(ctx: Context, pkgs: List<String>): Boolean {
-        if (pkgs.isEmpty()) return true
-        if (!HomeButtonService.forceStop(pkgs)) return false
-        save(ctx, list(ctx) - pkgs.toSet())
-        return true
-    }
+    /** Returns false if the Home button service isn't turned on, so nothing could be closed. */
+    fun close(ctx: Context, pkgs: List<String>): Boolean =
+        pkgs.isEmpty() || HomeButtonService.forceStop(ctx, pkgs)
+
+    /** Called by the service when it starts closing these apps. */
+    fun forget(ctx: Context, pkgs: List<String>) = save(ctx, list(ctx) - pkgs.toSet())
 
     fun closeAll(ctx: Context) = close(ctx, list(ctx))
 
     private fun save(ctx: Context, list: List<String>) =
         prefs(ctx).edit().putString(KEY, list.joinToString(",")).apply()
 
-    private fun prefs(ctx: Context) = ctx.getSharedPreferences("sakura", Context.MODE_PRIVATE)
+    @Suppress("DEPRECATION")
+    private fun prefs(ctx: Context) = ctx.getSharedPreferences("sakura_open_apps", Context.MODE_MULTI_PROCESS)
 }

@@ -3,7 +3,7 @@
   Installs Sakura Home on a Fire TV and hands it the Home button.
 
 .EXAMPLE
-  .\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.3.apk
+  .\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.5.apk
 
 .NOTES
   Fire OS won't let you change the default launcher, so Sakura Home uses an accessibility
@@ -13,7 +13,7 @@
 #>
 param(
     [Parameter(Mandatory)] [string]$TvIp,
-    [string]$Apk = "SakuraHome-1.3.apk",
+    [string]$Apk = "SakuraHome-1.5.apk",
     [string]$Adb = "adb",
     [switch]$Uninstall
 )

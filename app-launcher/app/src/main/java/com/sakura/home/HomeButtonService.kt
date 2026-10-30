@@ -1,7 +1,10 @@
 package com.sakura.home
 
 import android.accessibilityservice.AccessibilityService
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.SystemClock
 import android.provider.Settings
 import android.view.KeyEvent
@@ -12,6 +15,10 @@ import android.view.accessibility.AccessibilityEvent
  * Amazon's home activity coming to the front and immediately opens Sakura Home instead.
  * Also starts Sakura Home at boot, since the system connects this service on startup,
  * and drives [AdMuter] while HBO Max or Hulu is on screen.
+ *
+ * It runs in its own small process (see the manifest), so when memory runs low Android can
+ * close the home screen to make room for the app you're watching without losing the Home
+ * button. The home screen talks to it with Sakura-only broadcasts.
  */
 class HomeButtonService : AccessibilityService() {
 
@@ -20,18 +27,31 @@ class HomeButtonService : AccessibilityService() {
         // launch looks exactly like "Amazon home appeared". Callers open this window first.
         @Volatile private var allowAmazonUntil = 0L
 
-        fun allowAmazonHomeBriefly() {
+        private fun allowAmazonHomeBriefly() {
             allowAmazonUntil = SystemClock.uptimeMillis() + 5000
         }
 
         private const val LONG_PRESS_MS = 600L
 
-        @Volatile private var instance: HomeButtonService? = null
+        private const val ACTION_CLOSE = "com.sakura.home.action.CLOSE_APPS"
+        private const val ACTION_ALLOW_AMAZON = "com.sakura.home.action.ALLOW_AMAZON_HOME"
+        private const val EXTRA_PKGS = "pkgs"
+        private const val PERMISSION = "com.sakura.home.permission.CONTROL"
 
-        /** Force-stops these apps, then returns home. False if the service isn't running. */
-        fun forceStop(pkgs: List<String>): Boolean {
-            val s = instance ?: return false
-            s.closer.stop(pkgs)
+        private fun send(ctx: Context, intent: Intent) =
+            ctx.sendBroadcast(intent.setPackage(ctx.packageName), PERMISSION)
+
+        private fun isOn(ctx: Context) =
+            Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+                ?.contains("${ctx.packageName}/") == true
+
+        /** From the home screen: Settings is about to open inside Amazon's home app. */
+        fun allowAmazonHomeBriefly(ctx: Context) = send(ctx, Intent(ACTION_ALLOW_AMAZON))
+
+        /** Force-stops these apps, then returns home. False if the service is turned off. */
+        fun forceStop(ctx: Context, pkgs: List<String>): Boolean {
+            if (!isOn(ctx)) return false
+            send(ctx, Intent(ACTION_CLOSE).putExtra(EXTRA_PKGS, pkgs.toTypedArray()))
             return true
         }
 
@@ -44,11 +64,26 @@ class HomeButtonService : AccessibilityService() {
     private lateinit var adMuter: AdMuter
     private lateinit var closer: AppCloser
 
+    private val commands = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                ACTION_ALLOW_AMAZON -> allowAmazonHomeBriefly()
+                ACTION_CLOSE -> intent.getStringArrayExtra(EXTRA_PKGS)?.toList()?.let {
+                    OpenApps.forget(this@HomeButtonService, it)
+                    closer.stop(it)
+                }
+            }
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         adMuter = AdMuter(this)
         closer = AppCloser(this) { goHome() }
-        instance = this
+        registerReceiver(commands, IntentFilter().apply {
+            addAction(ACTION_CLOSE)
+            addAction(ACTION_ALLOW_AMAZON)
+        }, PERMISSION, null)
         // Take over right after boot, or if Amazon's home is showing (e.g. Sakura was just
         // updated), but never when the service is re-enabled mid-show
         val front = rootInActiveWindow?.packageName?.toString()
@@ -111,7 +146,7 @@ class HomeButtonService : AccessibilityService() {
     override fun onInterrupt() {}
 
     override fun onUnbind(intent: Intent?): Boolean {
-        instance = null
+        runCatching { unregisterReceiver(commands) }
         adMuter.shutdown()
         return super.onUnbind(intent)
     }

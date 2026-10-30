@@ -2,6 +2,8 @@ package com.sakura.home
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 
 data class AppEntry(
@@ -60,18 +62,37 @@ object Apps {
                 byPkg[ai.packageName] = AppEntry(
                     pkg = ai.packageName,
                     label = ri.loadLabel(pm).toString(),
-                    banner = banner,
-                    icon = ri.loadIcon(pm),
+                    banner = banner?.let { fit(ctx, it, 200, 113) },
+                    icon = fit(ctx, ri.loadIcon(pm), 32, 32),
                     launch = launch,
                 )
             }
         }
         return byPkg.values.sortedBy { it.label.lowercase() }
     }
+
+    /**
+     * Redraws an app's artwork at the size its card shows it (in dp, plus room for the focus
+     * zoom), so a big banner doesn't sit in memory at full resolution behind a small card.
+     */
+    private fun fit(ctx: Context, d: Drawable, wDp: Int, hDp: Int): Drawable {
+        val density = ctx.resources.displayMetrics.density
+        val w = (wDp * density).toInt()
+        val h = (hDp * density).toInt()
+        if (d is BitmapDrawable && d.bitmap.width <= w && d.bitmap.height <= h) return d
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = android.graphics.Canvas(bmp)
+        d.setBounds(0, 0, w, h)
+        d.draw(c)
+        return BitmapDrawable(ctx.resources, bmp)
+    }
 }
 
-class Prefs(ctx: Context) {
-    private val sp = ctx.getSharedPreferences("sakura", Context.MODE_PRIVATE)
+class Prefs(private val ctx: Context) {
+    // Written by the home screen, read by the Home button service in its own process:
+    // multi-process mode re-reads the file when the other process has changed it
+    @Suppress("DEPRECATION")
+    private val sp get() = ctx.getSharedPreferences("sakura", Context.MODE_MULTI_PROCESS)
 
     var favorites: List<String>
         get() = sp.getString("favorites", null)?.split(',')?.filter { it.isNotBlank() }

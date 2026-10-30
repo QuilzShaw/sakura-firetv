@@ -4,6 +4,10 @@
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
+    <!-- Only Sakura itself may tell its Home button service to close apps -->
+    <permission android:name="com.sakura.home.permission.CONTROL" android:protectionLevel="signature" />
+    <uses-permission android:name="com.sakura.home.permission.CONTROL" />
+
 
     <!-- See every launchable app so they can be shown on the home screen -->
     <queries>
@@ -52,6 +56,7 @@
         <!-- Sends the remote's Home button to Sakura Home (Fire OS blocks changing the default launcher) -->
         <service
             android:name=".HomeButtonService"
+            android:process=":keys"
             android:exported="false"
             android:label="@string/service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">

@@ -99,6 +99,7 @@ Fire OS doesn't let you change the default launcher, so Sakura Home uses an **ac
 - **Hold Home** to open Fire TV settings. Amazon's quick-settings panel only accepts Amazon-signed apps, so this replaces it.
 - Fire OS hosts its main **Settings** screen inside Amazon's home app, so Sakura Home briefly allows it whenever you open Settings. Otherwise you could never reach them.
 - It only acts on Amazon's *home* activity, so Alexa, Amazon search and profiles still work.
+- The service runs in its own tiny process (about 8 MB). When memory runs low, Android can close Sakura's home screen to make room for your show without losing the Home button, so Amazon's home screen (over 200 MB) never gets a chance to load.
 
 ## 🧹 What the debloat script changes
 
@@ -110,6 +111,7 @@ Fire OS doesn't let you change the default launcher, so Sakura Home uses an **ac
 | **Advertising ID service, telemetry, logging and Wi-Fi metrics disabled** | These run in the background and phone home. |
 | **"Special Offers" ad service, sponsored recommendations, ad screensaver and promo notifications disabled** | The rest of Amazon's own ads. (Ambient Experience stays on because it also draws Alexa's voice search; with sleep and the screensaver off, its idle ad cards never come up.) |
 | **Shopping, miniTV, demo content, tutorials, release notes, Luna hub, forced-update prompts disabled** | Bloat and nags. |
+| **Restarting background services off** (Appstore, device-setup helpers and four more) | On the TV's 1.8 GB they kept relaunching and crowded out the app you're watching, until Hulu crashed back to the home screen. The Appstore is suspended rather than removed: run `adb shell pm unsuspend com.amazon.venezia` when you want to update apps. |
 | **Never sleeps on its own**; HDMI devices can't put it in standby | Fire OS only counts remote presses as activity, so it switched off after 14 minutes on a PC or console. Turn it off yourself with the power button. |
 | **Animations 1× → 0.5×** | Menus feel noticeably snappier. |
 | *Optional* `-RemoveApps` | Uninstalls preinstalled apps you don't use. Edit the list first, and reinstall any time from the Appstore. |
@@ -135,7 +137,7 @@ Two TV settings worth changing by hand:
 .\scripts\debloat-firetv.ps1 -TvIp 192.168.1.50 -Adb C:\path\to\platform-tools\adb.exe
 
 # Install Sakura Home (APK from the Releases page) and hand it the Home button
-.\scripts\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.3.apk -Adb C:\path\to\platform-tools\adb.exe
+.\scripts\install-sakura-home.ps1 -TvIp 192.168.1.50 -Apk .\SakuraHome-1.5.apk -Adb C:\path\to\platform-tools\adb.exe
 ```
 
 **Undo:** `restore-firetv.ps1` reverses the debloat, and `install-sakura-home.ps1 -Uninstall` removes the launcher.
@@ -161,7 +163,7 @@ app-launcher/app/src/main/java/com/sakura/home/
 ├── Apps.kt                finds installed apps and banners; saved favorites and hidden apps
 ├── OpenApps.kt            recents list and closing apps
 ├── SearchDialog.kt        search box: matching apps plus HBO Max's search page
-├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter
+├── HomeButtonService.kt   Home button takeover, start on boot, drives the ad muter (own process)
 ├── AppCloser.kt           closes apps by pressing Force stop in their settings page
 └── AdMuter.kt             HBO Max and Hulu ad-badge detection and mute/unmute
 ```
